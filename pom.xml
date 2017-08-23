@@ -29,7 +29,11 @@
         <artifactId>slf4j-simple</artifactId>
         <version>1.7.7</version>
       </dependency>
-
+    <dependency>
+      <groupId>com.flying</groupId>
+      <artifactId>vis-jdbc</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>ModbusTcp</finalName>

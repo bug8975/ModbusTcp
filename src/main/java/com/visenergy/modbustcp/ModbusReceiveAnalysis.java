@@ -19,6 +19,17 @@ public class ModbusReceiveAnalysis {
     private static final String localIp = "192.168.100.121";
     private static final int localPort = 9092;
     protected static SocketIOServer server = null;
+    private static  DataHandle dataHandle = new DataHandle();
+    protected static Integer[] arraySDGL = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayCNGL = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayGFGL = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL1 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL2 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL3 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL4 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL5 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arrayFZGL6 = new Integer[]{0,0,0,0,0};
+
     static {
         Configuration config = new Configuration();
         config.setHostname(localIp);
@@ -48,12 +59,6 @@ public class ModbusReceiveAnalysis {
 //            int CNIC = Integer.parseInt(answer[23].concat(answer[24]),16);
             log.debug("直流电压："+DCU);
             log.debug("直流电流："+DCI);
-//            log.debug("储能A相电压："+CNUA);
-//            log.debug("储能B相电压："+CNUB);
-//            log.debug("储能C相电压："+CNUC);
-//            log.debug("储能A相电流："+CNIA);
-//            log.debug("储能B相电流："+CNIB);
-//            log.debug("储能C相电流："+CNIC);
 
             int SDUA = Integer.parseInt(answer[25].concat(answer[26]),16);
             int SDUB = Integer.parseInt(answer[27].concat(answer[28]),16);
@@ -72,14 +77,11 @@ public class ModbusReceiveAnalysis {
             log.debug("市电A相电压："+SDUA);
             log.debug("市电B相电压："+SDUB);
             log.debug("市电C相电压："+SDUC);
-//            log.debug("功率因数："+GLYS);
-//            log.debug("无功功率："+WGGL);
             log.debug("逆变效率："+new BigDecimal(Integer.parseInt(answer[35].concat(answer[36]),16)).multiply(new BigDecimal("0.1"))+"%");
             //log.debug("预留："+Integer.parseInt(answer[37].concat(answer[38]),16));
             log.debug("并离网状态："+BLWZT);
             log.debug("逆变频率："+new BigDecimal(Integer.parseInt(answer[41].concat(answer[42]),16)).multiply(new BigDecimal("0.1")));
             log.debug("市电频率："+SDPL);
-//            log.debug("有功功率："+YGGL+"kw");
             log.debug("故障代码："+GZDM);
             log.debug("启停标志："+QTBZ);
             log.debug("工作模式："+GZMS);
@@ -101,6 +103,19 @@ public class ModbusReceiveAnalysis {
             map.put("ZCDL",ZCDL);
             map.put("ZFDL",ZFDL);
             map.put("SZDMS",SZDMS);
+            dataHandle.setDCU(DCU);
+            dataHandle.setDCI(DCI);
+            dataHandle.setSDUA(SDUA);
+            dataHandle.setSDUB(SDUB);
+            dataHandle.setSDUC(SDUC);
+            dataHandle.setSDPL(SDPL.doubleValue());
+            dataHandle.setBLWZT(BLWZT);
+            dataHandle.setGZDM(GZDM);
+            dataHandle.setQTBZ(QTBZ);
+            dataHandle.setGZMS(GZMS);
+            dataHandle.setZCDL(ZCDL);
+            dataHandle.setZFDL(ZFDL);
+            dataHandle.setSZDMS(SZDMS);
             server.getBroadcastOperations().sendEvent("status",map);
         } else if (lenth == 59) {
             int SDGL  = ((byte)Integer.parseInt(answer[11].concat(answer[12]),16))+((byte)Integer.parseInt(answer[13].concat(answer[14]),16))+((byte)Integer.parseInt(answer[15].concat(answer[16]),16));
@@ -113,35 +128,89 @@ public class ModbusReceiveAnalysis {
             int FZGL5 = ((byte)Integer.parseInt(answer[53].concat(answer[54]),16))+((byte)Integer.parseInt(answer[55].concat(answer[56]),16))+((byte)Integer.parseInt(answer[57].concat(answer[58]),16));
             int FZGL6 = ((byte)Integer.parseInt(answer[59].concat(answer[60]),16))+((byte)Integer.parseInt(answer[61].concat(answer[62]),16))+((byte)Integer.parseInt(answer[63].concat(answer[64]),16));
 
-            //log.debug("6负载切除状态："+Integer.parseInt(answer[9].concat(answer[10]),16));
-            log.debug("市电A相有功功率："+Integer.parseInt(answer[11].concat(answer[12]),16));
-            log.debug("市电B相有功功率："+Integer.parseInt(answer[13].concat(answer[14]),16));
-            log.debug("市电C相有功功率："+Integer.parseInt(answer[15].concat(answer[16]),16));
-            log.debug("储能A相有功功率："+Integer.parseInt(answer[17].concat(answer[18]),16));
-            log.debug("储能B相有功功率："+Integer.parseInt(answer[19].concat(answer[20]),16));
-            log.debug("储能C相有功功率："+Integer.parseInt(answer[21].concat(answer[22]),16));
-            log.debug("光伏A相有功功率："+Integer.parseInt(answer[23].concat(answer[24]),16));
-            log.debug("光伏B相有功功率："+Integer.parseInt(answer[25].concat(answer[26]),16));
-            log.debug("光伏C相有功功率："+Integer.parseInt(answer[27].concat(answer[28]),16));
-            log.debug("一负载A相有功功率："+Integer.parseInt(answer[29].concat(answer[30]),16));
-            log.debug("一负载B相有功功率："+Integer.parseInt(answer[31].concat(answer[32]),16));
-            log.debug("一负载C相有功功率："+Integer.parseInt(answer[33].concat(answer[34]),16));
-            log.debug("二负载A相有功功率："+Integer.parseInt(answer[35].concat(answer[36]),16));
-            log.debug("二负载B相有功功率："+Integer.parseInt(answer[37].concat(answer[38]),16));
-            log.debug("二负载C相有功功率："+Integer.parseInt(answer[39].concat(answer[40]),16));
-            log.debug("三负载A相有功功率："+Integer.parseInt(answer[41].concat(answer[42]),16));
-            log.debug("三负载B相有功功率："+Integer.parseInt(answer[43].concat(answer[44]),16));
-            log.debug("三负载C相有功功率："+Integer.parseInt(answer[45].concat(answer[46]),16));
-            log.debug("四负载A相有功功率："+Integer.parseInt(answer[47].concat(answer[48]),16));
-            log.debug("四负载B相有功功率："+Integer.parseInt(answer[49].concat(answer[50]),16));
-            log.debug("四负载B相有功功率："+Integer.parseInt(answer[51].concat(answer[52]),16));
-            log.debug("五负载A相有功功率："+Integer.parseInt(answer[53].concat(answer[54]),16));
-            log.debug("五负载B相有功功率："+Integer.parseInt(answer[55].concat(answer[56]),16));
-            log.debug("五负载C相有功功率："+Integer.parseInt(answer[57].concat(answer[58]),16));
-            log.debug("六负载A相有功功率："+Integer.parseInt(answer[59].concat(answer[60]),16));
-            log.debug("六负载B相有功功率："+Integer.parseInt(answer[61].concat(answer[62]),16));
-            log.debug("六负载C相有功功率："+Integer.parseInt(answer[63].concat(answer[64]),16));
+            for (int i = 0; i < arraySDGL.length - 1; i++) {
+                arraySDGL[i] = arraySDGL[i+1];
+                arraySDGL[arraySDGL.length] = SDGL;
+
+                arrayCNGL[i] = arrayCNGL[i+1];
+                arrayCNGL[arrayCNGL.length] = CNGL;
+
+                arrayGFGL[i] = arrayGFGL[i+1];
+                arrayGFGL[arrayGFGL.length] = GFGL;
+
+                arrayFZGL1[i] = arrayFZGL1[i+1];
+                arrayFZGL1[arrayFZGL1.length] = FZGL1;
+
+                arrayFZGL2[i] = arrayFZGL2[i+1];
+                arrayFZGL2[arrayFZGL2.length] = FZGL2;
+
+                arrayFZGL3[i] = arrayFZGL3[i+1];
+                arrayFZGL3[arrayFZGL3.length] = FZGL3;
+
+                arrayFZGL4[i] = arrayFZGL4[i+1];
+                arrayFZGL4[arrayFZGL4.length] = FZGL4;
+
+                arrayFZGL5[i] = arrayFZGL5[i+1];
+                arrayFZGL5[arrayFZGL5.length] = FZGL5;
+
+                arrayFZGL6[i] = arrayFZGL6[i+1];
+                arrayFZGL6[arrayFZGL6.length] = FZGL6;
+            }
+            int SDKG = Integer.parseInt(answer[9].concat(answer[10]),16);
+            int CNKG = Integer.parseInt(answer[13].concat(answer[14]),16);
+            int GFKG = Integer.parseInt(answer[17].concat(answer[18]),16);
+            int FZKG1 = Integer.parseInt(answer[21].concat(answer[22]),16);
+            int FZKG2 = Integer.parseInt(answer[25].concat(answer[26]),16);
+            int FZKG3 = Integer.parseInt(answer[29].concat(answer[30]),16);
+            int FZKG4 = Integer.parseInt(answer[33].concat(answer[34]),16);
+            int FZKG5 = Integer.parseInt(answer[37].concat(answer[38]),16);
+            int FZKG6 = Integer.parseInt(answer[41].concat(answer[42]),16);
+            log.debug("市电投入状态："+Integer.parseInt(answer[9].concat(answer[10]),16));
+            log.debug("储能投入状态："+Integer.parseInt(answer[13].concat(answer[14]),16));
+            log.debug("光伏投入状态："+Integer.parseInt(answer[17].concat(answer[18]),16));
+            log.debug("1负载投入状态："+Integer.parseInt(answer[21].concat(answer[22]),16));
+            log.debug("2负载投入状态："+Integer.parseInt(answer[25].concat(answer[26]),16));
+            log.debug("3负载投入状态："+Integer.parseInt(answer[29].concat(answer[30]),16));
+            log.debug("4负载投入状态："+Integer.parseInt(answer[33].concat(answer[34]),16));
+            log.debug("5负载投入状态："+Integer.parseInt(answer[37].concat(answer[38]),16));
+            log.debug("6负载投入状态："+Integer.parseInt(answer[41].concat(answer[42]),16));
+            log.debug("市电A相有功功率："+Integer.parseInt(answer[45].concat(answer[46]),16));
+            log.debug("市电B相有功功率："+Integer.parseInt(answer[47].concat(answer[48]),16));
+            log.debug("市电C相有功功率："+Integer.parseInt(answer[49].concat(answer[50]),16));
+            log.debug("储能A相有功功率："+Integer.parseInt(answer[51].concat(answer[52]),16));
+            log.debug("储能B相有功功率："+Integer.parseInt(answer[53].concat(answer[54]),16));
+            log.debug("储能C相有功功率："+Integer.parseInt(answer[55].concat(answer[56]),16));
+            log.debug("光伏A相有功功率："+Integer.parseInt(answer[57].concat(answer[58]),16));
+            log.debug("光伏B相有功功率："+Integer.parseInt(answer[59].concat(answer[60]),16));
+            log.debug("光伏C相有功功率："+Integer.parseInt(answer[61].concat(answer[62]),16));
+            log.debug("一负载A相有功功率："+Integer.parseInt(answer[63].concat(answer[64]),16));
+            log.debug("一负载B相有功功率："+Integer.parseInt(answer[65].concat(answer[66]),16));
+            log.debug("一负载C相有功功率："+Integer.parseInt(answer[67].concat(answer[68]),16));
+            log.debug("二负载A相有功功率："+Integer.parseInt(answer[69].concat(answer[70]),16));
+            log.debug("二负载B相有功功率："+Integer.parseInt(answer[71].concat(answer[72]),16));
+            log.debug("二负载C相有功功率："+Integer.parseInt(answer[73].concat(answer[74]),16));
+            log.debug("三负载A相有功功率："+Integer.parseInt(answer[75].concat(answer[76]),16));
+            log.debug("三负载B相有功功率："+Integer.parseInt(answer[77].concat(answer[78]),16));
+            log.debug("三负载C相有功功率："+Integer.parseInt(answer[79].concat(answer[80]),16));
+            log.debug("四负载A相有功功率："+Integer.parseInt(answer[81].concat(answer[82]),16));
+            log.debug("四负载B相有功功率："+Integer.parseInt(answer[83].concat(answer[84]),16));
+            log.debug("四负载B相有功功率："+Integer.parseInt(answer[85].concat(answer[86]),16));
+            log.debug("五负载A相有功功率："+Integer.parseInt(answer[87].concat(answer[88]),16));
+            log.debug("五负载B相有功功率："+Integer.parseInt(answer[89].concat(answer[90]),16));
+            log.debug("五负载C相有功功率："+Integer.parseInt(answer[91].concat(answer[92]),16));
+            log.debug("六负载A相有功功率："+Integer.parseInt(answer[93].concat(answer[94]),16));
+            log.debug("六负载B相有功功率："+Integer.parseInt(answer[95].concat(answer[96]),16));
+            log.debug("六负载C相有功功率："+Integer.parseInt(answer[97].concat(answer[98]),16));
             Map map =new HashMap();
+            map.put("SDKG",SDKG);
+            map.put("CNKG",CNKG);
+            map.put("GFKG",GFKG);
+            map.put("FZKG1",FZKG1);
+            map.put("FZKG2",FZKG2);
+            map.put("FZKG3",FZKG3);
+            map.put("FZKG4",FZKG4);
+            map.put("FZKG5",FZKG5);
+            map.put("FZKG6",FZKG6);
             map.put("SDGL",SDGL);
             map.put("CNGL",CNGL);
             map.put("GFGL",GFGL);
@@ -151,6 +220,15 @@ public class ModbusReceiveAnalysis {
             map.put("FZGL4",FZGL4);
             map.put("FZGL5",FZGL5);
             map.put("FZGL6",FZGL6);
+            dataHandle.setSDGL(SDGL);
+            dataHandle.setCNGL(CNGL);
+            dataHandle.setGFGL(GFGL);
+            dataHandle.setFZGL1(FZGL1);
+            dataHandle.setFZGL2(FZGL2);
+            dataHandle.setFZGL3(FZGL3);
+            dataHandle.setFZGL4(FZGL4);
+            dataHandle.setFZGL5(FZGL5);
+            dataHandle.setFZGL6(FZGL6);
             server.getBroadcastOperations().sendEvent("power",map);
         } else if (lenth == 99) {
             BigDecimal GFUA = new BigDecimal(Integer.parseInt(answer[9].concat(answer[10]),16)).multiply(new BigDecimal("0.1"));
@@ -351,7 +429,33 @@ public class ModbusReceiveAnalysis {
             map.put("FZIA6",FZIA6);
             map.put("FZIB6",FZIB6);
             map.put("FZIC6",FZIC6);
-
+            dataHandle.setSDIA(SDIA);
+            dataHandle.setCNIA(CNIA);
+            dataHandle.setGFIA(GFIA);
+            dataHandle.setFZIA1(FZIA1);
+            dataHandle.setFZIA2(FZIA2);
+            dataHandle.setFZIA3(FZIA3);
+            dataHandle.setFZIA4(FZIA4);
+            dataHandle.setFZIA5(FZIA5);
+            dataHandle.setFZIA6(FZIA6);
+            dataHandle.setSDWG(SDWG.doubleValue());
+            dataHandle.setCNWG(CNWG.doubleValue());
+            dataHandle.setGFWG(GFWG.doubleValue());
+            dataHandle.setFZWG1(FZWG1.doubleValue());
+            dataHandle.setFZWG2(FZWG2.doubleValue());
+            dataHandle.setFZWG3(FZWG3.doubleValue());
+            dataHandle.setFZWG4(FZWG4.doubleValue());
+            dataHandle.setFZWG5(FZWG5.doubleValue());
+            dataHandle.setFZWG6(FZWG6.doubleValue());
+            dataHandle.setSDYS(SDYS.doubleValue());
+            dataHandle.setCNYS(CNYS.doubleValue());
+            dataHandle.setGFYS(GFYS.doubleValue());
+            dataHandle.setFZYS1(FZYS1.doubleValue());
+            dataHandle.setFZYS2(FZYS2.doubleValue());
+            dataHandle.setFZYS3(FZYS3.doubleValue());
+            dataHandle.setFZYS4(FZYS4.doubleValue());
+            dataHandle.setFZYS5(FZYS5.doubleValue());
+            dataHandle.setFZYS6(FZYS6.doubleValue());
             map.put("SDWG",SDWG);
             map.put("CDWG",CNWG);
             map.put("GFWG",GFWG);
