@@ -1,101 +1,111 @@
 package com.visenergy.modbustcp;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.DataListener;
+import com.rabbitmq.client.*;
+import com.visenergy.rabbitmq.RabbitMqUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
+import com.visenergy.utils.*;
 /**
  * @Author WuSong
  * @Date 2017-08-22
  * @Time 13:54:24
  */
 public class ModbusSwitchControl {
-    private static SocketIOServer server =  ModbusReceiveAnalysis.server;
     private static Logger log = Logger.getLogger(ModbusSwitchControl.class);
-    private static Properties properties = new Properties();
+    protected static Properties prop = new Properties();
     static {
         InputStream is = ModbusSwitchControl.class.getClassLoader().getResourceAsStream("registerAddress.properties");
         try {
-            InputStreamReader isr = new InputStreamReader(is,"UTF-8");
-            properties.load(isr);
+            //InputStreamReader isr = new InputStreamReader(is,"UTF-8");
+            prop.load(is);
         } catch (IOException e) {
-            log.debug("加载配置文件出错",e);
+            log.error("加载配置文件出错",e);
         }
     }
 
     /**
      * 九路开关控制
      */
-    public static void SwitchCommand(){
-       server.addEventListener("switch", String.class, new DataListener<String>() {
-           public void onData(SocketIOClient socketIOClient, String s, AckRequest ackRequest) throws Exception {
-               if (s.equals("FZ1_ON")){
-                   String address = properties.getProperty("一路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ1_OFF")) {
-                   String address = properties.getProperty("一路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ2_ON")) {
-                   String address = properties.getProperty("二路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ2_OFF")) {
-                   String address = properties.getProperty("二路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ3_ON")) {
-                   String address = properties.getProperty("三路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ3_OFF")) {
-                   String address = properties.getProperty("三路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ4_ON")) {
-                   String address = properties.getProperty("四路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ4_OFF")) {
-                   String address = properties.getProperty("四路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ5_ON")) {
-                   String address = properties.getProperty("五路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ5_OFF")) {
-                   String address = properties.getProperty("五路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ6_ON")) {
-                   String address = properties.getProperty("六路负载投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("FZ6_OFF")) {
-                   String address = properties.getProperty("六路负载切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("SD_ON")) {
-                   String address = properties.getProperty("市电投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("SD_OFF")) {
-                   String address = properties.getProperty("市电切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("GF_ON")) {
-                   String address = properties.getProperty("光伏投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("GF_OFF")) {
-                   String address = properties.getProperty("光伏切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("CN_ON")) {
-                   String address = properties.getProperty("储能投入");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else if (s.equals("CN_OFF")) {
-                   String address = properties.getProperty("储能切除");
-                   SocketClient.os.write(Utils.hexStringToBytes(GenerateCommand(address)));
-               } else {
-                   server.getBroadcastOperations().sendEvent("error","开关参数异常！");
-                   throw new Exception("开关参数异常！");
-               }
-           }
-       });
+    static {
+
+        try {
+            Connection conn  = RabbitMqUtils.newConnection();
+            Channel channel = RabbitMqUtils.createRabbitMqChannel(conn);
+            Consumer consumer = new DefaultConsumer(channel){
+                String message = null;
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    message = new String(body,"UTF-8");
+                    if (message.equals("FZ1_ON")){
+                        String address = prop.getProperty("一路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ1_OFF")) {
+                        String address = prop.getProperty("一路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ2_ON")) {
+                        String address = prop.getProperty("二路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ2_OFF")) {
+                        String address = prop.getProperty("二路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ3_ON")) {
+                        String address = prop.getProperty("三路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ3_OFF")) {
+                        String address = prop.getProperty("三路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ4_ON")) {
+                        String address = prop.getProperty("四路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ4_OFF")) {
+                        String address = prop.getProperty("四路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ5_ON")) {
+                        String address = prop.getProperty("五路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ5_OFF")) {
+                        String address = prop.getProperty("五路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ6_ON")) {
+                        String address = prop.getProperty("六路负载投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("FZ6_OFF")) {
+                        String address = prop.getProperty("六路负载切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("SD_ON")) {
+                        String address = prop.getProperty("市电投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("SD_OFF")) {
+                        String address = prop.getProperty("市电切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("GF_ON")) {
+                        String address = prop.getProperty("光伏投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("GF_OFF")) {
+                        String address = prop.getProperty("光伏切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("CN_ON")) {
+                        String address = prop.getProperty("储能投入");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else if (message.equals("CN_OFF")) {
+                        String address = prop.getProperty("储能切除");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(GenerateCommand(address)));
+                    } else {
+                        log.error("开关参数异常！");
+                    }
+                }
+            };
+            channel.basicConsume("SWITCH",true,consumer);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -115,5 +125,4 @@ public class ModbusSwitchControl {
         sbr.append("01");
         return sbr.toString();
     }
-
 }

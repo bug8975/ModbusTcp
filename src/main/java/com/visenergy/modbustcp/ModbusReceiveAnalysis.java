@@ -2,12 +2,20 @@ package com.visenergy.modbustcp;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.flying.jdbc.data.Parameter;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.visenergy.rabbitmq.RabbitMqUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @Author WuSong
@@ -15,35 +23,28 @@ import java.util.Map;
  * @Time 09:15:53
  */
 public class ModbusReceiveAnalysis {
+    private static Connection conn = null;
+    private static Channel channel = null;
     private static Logger log = Logger.getLogger(ModbusReceiveAnalysis.class);
-    private static final String localIp = "192.168.100.121";
-    private static final int localPort = 9092;
-    protected static SocketIOServer server = null;
     private static  DataHandle dataHandle = new DataHandle();
-    protected static Integer[] arraySDGL = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayCNGL = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayGFGL = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL1 = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL2 = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL3 = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL4 = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL5 = new Integer[]{0,0,0,0,0};
-    protected static Integer[] arrayFZGL6 = new Integer[]{0,0,0,0,0};
+    protected static Integer[] arraySDGL = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayCNGL = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayGFGL = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL1 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL2 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL3 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL4 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL5 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
+    protected static Integer[] arrayFZGL6 = new Integer[]{0,0,0,0,0,0,0,0,0,0};
 
-    static {
-        Configuration config = new Configuration();
-        config.setHostname(localIp);
-        config.setPort(localPort);
-        server = new SocketIOServer(config);
-        server.start();
-    }
+
 
     /**
      * 数据解析
      * @param received 传入命令
      * @throws Exception
      */
-    public static void analysis(String received) throws Exception {
+    public static void analysis(String received) throws IOException, TimeoutException {
 
         String[] answer = received.split(" ");
         int lenth = Integer.parseInt(answer[5],16);
@@ -65,6 +66,7 @@ public class ModbusReceiveAnalysis {
             int SDUC = Integer.parseInt(answer[29].concat(answer[30]),16);
 //            BigDecimal GLYS = new BigDecimal((byte)Integer.parseInt(answer[31].concat(answer[32]),16)).multiply(new BigDecimal("0.01"));
 //            BigDecimal WGGL = new BigDecimal((byte)Integer.parseInt(answer[33].concat(answer[34]),16)).multiply(new BigDecimal("0.1"));
+            BigDecimal NBXL = new BigDecimal(Integer.parseInt(answer[35].concat(answer[36]),16)).multiply(new BigDecimal("0.1"));
             int BLWZT = Integer.parseInt(answer[39].concat(answer[40]),16);
             BigDecimal SDPL = new BigDecimal(Integer.parseInt(answer[43].concat(answer[44]),16)).multiply(new BigDecimal("0.1"));
 //            BigDecimal YGGL = new BigDecimal(Integer.parseInt(answer[45].concat(answer[46]),16)).multiply(new BigDecimal("0.1"));
@@ -77,7 +79,7 @@ public class ModbusReceiveAnalysis {
             log.debug("市电A相电压："+SDUA);
             log.debug("市电B相电压："+SDUB);
             log.debug("市电C相电压："+SDUC);
-            log.debug("逆变效率："+new BigDecimal(Integer.parseInt(answer[35].concat(answer[36]),16)).multiply(new BigDecimal("0.1"))+"%");
+            log.debug("逆变效率："+NBXL+"%");
             //log.debug("预留："+Integer.parseInt(answer[37].concat(answer[38]),16));
             log.debug("并离网状态："+BLWZT);
             log.debug("逆变频率："+new BigDecimal(Integer.parseInt(answer[41].concat(answer[42]),16)).multiply(new BigDecimal("0.1")));
@@ -96,6 +98,7 @@ public class ModbusReceiveAnalysis {
             map.put("SDUB",SDUB);
             map.put("SDUC",SDUC);
             map.put("SDPL",SDPL);
+            map.put("NBXL",NBXL);
             map.put("BLWZT",BLWZT);
             map.put("GZDM",GZDM);
             map.put("QTBZ",QTBZ);
@@ -116,7 +119,7 @@ public class ModbusReceiveAnalysis {
             dataHandle.setZCDL(ZCDL);
             dataHandle.setZFDL(ZFDL);
             dataHandle.setSZDMS(SZDMS);
-            server.getBroadcastOperations().sendEvent("status",map);
+            RabbitMqUtils.sendMq(getChannel(),"STATUS",map.toString());
         } else if (lenth == 59) {
             int SDGL  = ((byte)Integer.parseInt(answer[11].concat(answer[12]),16))+((byte)Integer.parseInt(answer[13].concat(answer[14]),16))+((byte)Integer.parseInt(answer[15].concat(answer[16]),16));
             int CNGL  = ((byte)Integer.parseInt(answer[17].concat(answer[18]),16))+((byte)Integer.parseInt(answer[19].concat(answer[20]),16))+((byte)Integer.parseInt(answer[21].concat(answer[22]),16));
@@ -130,32 +133,25 @@ public class ModbusReceiveAnalysis {
 
             for (int i = 0; i < arraySDGL.length - 1; i++) {
                 arraySDGL[i] = arraySDGL[i+1];
-                arraySDGL[arraySDGL.length] = SDGL;
-
                 arrayCNGL[i] = arrayCNGL[i+1];
-                arrayCNGL[arrayCNGL.length] = CNGL;
-
                 arrayGFGL[i] = arrayGFGL[i+1];
-                arrayGFGL[arrayGFGL.length] = GFGL;
-
                 arrayFZGL1[i] = arrayFZGL1[i+1];
-                arrayFZGL1[arrayFZGL1.length] = FZGL1;
-
                 arrayFZGL2[i] = arrayFZGL2[i+1];
-                arrayFZGL2[arrayFZGL2.length] = FZGL2;
-
                 arrayFZGL3[i] = arrayFZGL3[i+1];
-                arrayFZGL3[arrayFZGL3.length] = FZGL3;
-
                 arrayFZGL4[i] = arrayFZGL4[i+1];
-                arrayFZGL4[arrayFZGL4.length] = FZGL4;
-
                 arrayFZGL5[i] = arrayFZGL5[i+1];
-                arrayFZGL5[arrayFZGL5.length] = FZGL5;
-
                 arrayFZGL6[i] = arrayFZGL6[i+1];
-                arrayFZGL6[arrayFZGL6.length] = FZGL6;
             }
+            arraySDGL[arraySDGL.length-1] = SDGL;
+            arrayCNGL[arrayCNGL.length-1] = CNGL;
+            arrayGFGL[arrayGFGL.length-1] = GFGL;
+            arrayFZGL1[arrayFZGL1.length-1] = FZGL1;
+            arrayFZGL2[arrayFZGL2.length-1] = FZGL2;
+            arrayFZGL3[arrayFZGL3.length-1] = FZGL3;
+            arrayFZGL4[arrayFZGL4.length-1] = FZGL4;
+            arrayFZGL5[arrayFZGL5.length-1] = FZGL5;
+            arrayFZGL6[arrayFZGL6.length-1] = FZGL6;
+
             int SDKG = Integer.parseInt(answer[9].concat(answer[10]),16);
             int CNKG = Integer.parseInt(answer[13].concat(answer[14]),16);
             int GFKG = Integer.parseInt(answer[17].concat(answer[18]),16);
@@ -229,7 +225,8 @@ public class ModbusReceiveAnalysis {
             dataHandle.setFZGL4(FZGL4);
             dataHandle.setFZGL5(FZGL5);
             dataHandle.setFZGL6(FZGL6);
-            server.getBroadcastOperations().sendEvent("power",map);
+
+            RabbitMqUtils.sendMq(getChannel(),"POWER",map.toString());
         } else if (lenth == 99) {
             BigDecimal GFUA = new BigDecimal(Integer.parseInt(answer[9].concat(answer[10]),16)).multiply(new BigDecimal("0.1"));
             BigDecimal GFUB = new BigDecimal(Integer.parseInt(answer[11].concat(answer[12]),16)).multiply(new BigDecimal("0.1"));
@@ -474,27 +471,33 @@ public class ModbusReceiveAnalysis {
             map.put("FZYS4",FZYS4);
             map.put("FZYS5",FZYS5);
             map.put("FZYS6",FZYS6);
-            server.getBroadcastOperations().sendEvent("voltageAndCurrent",map);
+            RabbitMqUtils.sendMq(getChannel(),"VOLTAGE_CURRENT",map.toString());
         } else if (lenth == 6) {
 
+            RabbitMqUtils.sendMq(getChannel(),"SWITCH_RETURN","SUCCESS");
         } else {
-            throw new Exception("返回的数据格式不对，无法解析");
+                log.error("返回的数据格式不对，无法解析!");
         }
 
     }
+    public static Channel getChannel() {
+        try {
+            if(conn == null){
+                conn = RabbitMqUtils.newConnection();
+            }
+            if(channel == null){
+                channel = conn.createChannel();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        return channel;
+    }
+
 
     public static void main(String[] args) throws Exception {
-//        System.out.println(Integer.parseInt("02".concat("58"),16));
-//        System.out.println(Integer.toHexString(00).length() < 2 ? "0".concat(Integer.toHexString(0)) : Integer.toHexString(0));
 //    analysis("00 00 00 00 00 39 01 03 4E 02 67 00 01 00 DD 00 00 00 DC 00 00 00 DD 00 00 00 00 00 01 00 01 FF CB FF F8 03 D9 00 00 00 00 01 F3 00 00 FF F8 00 00 00 01 00 05 00 00 00 02 00 00 00 EA 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 64 00 00 00 03 00 DC 00 00");
-//        String[] answer = new String[13];
-//        answer[11]="FF";
-//        answer[12]="FB";
-//        int DCI = answer[11].contains("FF") ? new BigInteger("FFFF".concat(answer[11].concat(answer[12])),16).intValue():Integer.parseInt(answer[11].concat(answer[12]),16);
-        //log.debug("直流电流："+DCI);
-        System.out.println(Integer.toHexString(5));
-       // System.out.println(new BigInteger("FFFF".concat("FFFB"),16).intValue());
-//        System.out.println(Integer.parseInt("cb",16));
-//        System.out.println((byte)Integer.parseInt("cb",16));
     }
 }

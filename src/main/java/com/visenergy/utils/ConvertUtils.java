@@ -1,9 +1,9 @@
-package com.visenergy.modbustcp;
+package com.visenergy.utils;
 
 /**
  * Created by zhonghuan on 17/5/8.
  */
-public class Utils {
+public class ConvertUtils {
     static final char[] HEX_CHAR_TABLE = {
             '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
     };
