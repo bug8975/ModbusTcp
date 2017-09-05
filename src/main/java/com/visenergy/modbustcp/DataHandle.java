@@ -146,9 +146,6 @@ static int m =1;
         service.scheduleAtFixedRate(runnable,0,30, TimeUnit.SECONDS);
     }
 
-
-
-
     public int getDCU() {
         return DCU;
     }
