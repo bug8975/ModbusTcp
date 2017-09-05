@@ -473,7 +473,6 @@ public class ModbusReceiveAnalysis {
             map.put("FZYS6",FZYS6);
             RabbitMqUtils.sendMq(getChannel(),"VOLTAGE_CURRENT",map.toString());
         } else if (lenth == 6) {
-
             RabbitMqUtils.sendMq(getChannel(),"SWITCH_RETURN","SUCCESS");
         } else {
                 log.error("返回的数据格式不对，无法解析!");
