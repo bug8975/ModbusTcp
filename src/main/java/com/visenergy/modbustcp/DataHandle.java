@@ -72,7 +72,7 @@ static int j =1;
 static int k =1;
 static int m =1;
     static {
-        SqlHelper.connPool = new DBConnectionPool(30);
+        SqlHelper.connPool = new DBConnectionPool(10);
     }
     /** 存储数据到数据库*/
     public  DataHandle(){

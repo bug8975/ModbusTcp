@@ -26,10 +26,10 @@ public class test {
         ServerSocket serverSocket = new ServerSocket(3000);
 
 
-            Socket socket = serverSocket.accept();
-            is = socket.getInputStream();
-            os = socket.getOutputStream();
-
+        Socket socket = serverSocket.accept();
+        System.out.println("连接：" + socket.getInetAddress());
+        is = socket.getInputStream();
+        os = socket.getOutputStream();
 
         Runnable runnable = new Runnable() {
             public void run() {
