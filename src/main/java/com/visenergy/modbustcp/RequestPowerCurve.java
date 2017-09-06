@@ -1,9 +1,10 @@
 package com.visenergy.modbustcp;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.*;
 import com.visenergy.rabbitmq.RabbitMqUtils;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -14,31 +15,80 @@ import java.util.concurrent.TimeoutException;
  * @Time 14:02:10
  */
 public class RequestPowerCurve {
-    private  Connection conn = null;
-    private  Channel channel = null;
-    public RequestPowerCurve(){
+    private static Connection conn = null;
+    private static Channel channel = null;
+    private static Logger log = Logger.getLogger(RequestPowerCurve.class);
 
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.add(0,ModbusReceiveAnalysis.arraySDGL);
-        jsonArray.add(1,ModbusReceiveAnalysis.arrayCNGL);
-        jsonArray.add(2,ModbusReceiveAnalysis.arrayGFGL);
-        jsonArray.add(3,ModbusReceiveAnalysis.arrayFZGL1);
-        jsonArray.add(4,ModbusReceiveAnalysis.arrayFZGL2);
-        jsonArray.add(5,ModbusReceiveAnalysis.arrayFZGL3);
-        jsonArray.add(6,ModbusReceiveAnalysis.arrayFZGL4);
-        jsonArray.add(7,ModbusReceiveAnalysis.arrayFZGL5);
-        jsonArray.add(8,ModbusReceiveAnalysis.arrayFZGL6);
+    public RequestPowerCurve() throws IOException, TimeoutException {
+        RabbitMqUtils.sendMq(getChannel2(),"REQUEST","");
+    }
+    static {
         try {
-            RabbitMqUtils.sendMq(getChannel(),"POWER",jsonArray.toString());
+            Connection conn  = RabbitMqUtils.newConnection();
+            Channel channel = RabbitMqUtils.createRabbitMqChannel(conn);
+            Consumer consumer = new DefaultConsumer(channel){
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray.add(0,ModbusReceiveAnalysis.arraySDGL);
+                    jsonArray.add(1,ModbusReceiveAnalysis.arrayCNGL);
+                    jsonArray.add(2,ModbusReceiveAnalysis.arrayGFGL);
+                    jsonArray.add(3,ModbusReceiveAnalysis.arrayFZGL1);
+                    jsonArray.add(4,ModbusReceiveAnalysis.arrayFZGL2);
+                    jsonArray.add(5,ModbusReceiveAnalysis.arrayFZGL3);
+                    jsonArray.add(6,ModbusReceiveAnalysis.arrayFZGL4);
+                    jsonArray.add(7,ModbusReceiveAnalysis.arrayFZGL5);
+                    jsonArray.add(8,ModbusReceiveAnalysis.arrayFZGL6);
+                    try {
+                        RabbitMqUtils.sendMq(getChannel2(),"POWER_ARRAY",jsonArray.toString());
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            channel.basicConsume("REQUEST",true,consumer);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("初始化RabbitMQ失败",e);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.error("初始化RabbitMQ失败",e);
         }
 
+        try {
+            Connection conn  = RabbitMqUtils.newConnection();
+            Channel channel = RabbitMqUtils.createRabbitMqChannel(conn);
+            Consumer consumer = new DefaultConsumer(channel){
+                String message = null;
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    message = new String(body,"UTF-8");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("SDKG",ModbusReceiveAnalysis.SDKG);
+                    jsonObject.put("CNKG",ModbusReceiveAnalysis.CNKG);
+                    jsonObject.put("GFKG",ModbusReceiveAnalysis.GFKG);
+                    jsonObject.put("FZKG1",ModbusReceiveAnalysis.FZKG1);
+                    jsonObject.put("FZKG2",ModbusReceiveAnalysis.FZKG2);
+                    jsonObject.put("FZKG3",ModbusReceiveAnalysis.FZKG3);
+                    jsonObject.put("FZKG4",ModbusReceiveAnalysis.FZKG4);
+                    jsonObject.put("FZKG5",ModbusReceiveAnalysis.FZKG5);
+                    jsonObject.put("FZKG6",ModbusReceiveAnalysis.FZKG6);
+                    jsonObject.put("BLWZT",ModbusReceiveAnalysis.BLWZT);
+                    try {
+                        RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS_RETURN",jsonObject.toString());
+                        log.debug(jsonObject.toString());
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            channel.basicConsume("SWITCH_STATUS",true,consumer);
+        } catch (IOException e) {
+            log.error("初始化RabbitMQ失败",e);
+        } catch (TimeoutException e) {
+            log.error("初始化RabbitMQ失败",e);
+        }
     }
 
-    public  Channel getChannel() {
+    public static Channel getChannel2() {
         try {
             if(conn == null){
                 conn = RabbitMqUtils.newConnection();

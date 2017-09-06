@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.TimeoutException;
+
 import com.visenergy.utils.*;
 /**
  * @Author WuSong
@@ -18,7 +20,8 @@ public class SocketClient {
     static InputStream is = null;
     static OutputStream os = null;
 
-    public SocketClient() throws IOException {
+    public SocketClient() throws IOException, TimeoutException {
+        new ModbusSwitchControl();
         new RequestPowerCurve();
          socket = new Socket(remoteIp,port);
          is = socket.getInputStream();
@@ -38,7 +41,8 @@ public class SocketClient {
                 byte[] head = new byte[6];
                 head[0] = (byte) data;
                 is.read(head,1,5);
-                int length = (int) head[5];
+                int length = Integer.parseInt((Integer.toHexString(head[4])).concat(Integer.toHexString(head[5])),16);
+                System.out.println(length);
                 byte[] overData = new byte[length];
                 for (int i = 0; i < length; i++) {
                     overData[i] = (byte) is.read();
@@ -71,9 +75,9 @@ public class SocketClient {
                         os.write(ConvertUtils.hexStringToBytes(queryMiddle));
                         sleep(1000);
                         os.write(ConvertUtils.hexStringToBytes(queryAfter));
-                        System.out.println("send："+ConvertUtils.addSpace(queryBefoer));
+                     /*   System.out.println("send："+ConvertUtils.addSpace(queryBefoer));
                         System.out.println("send："+ConvertUtils.addSpace(queryMiddle));
-                        System.out.println("send："+ConvertUtils.addSpace(queryAfter));
+                        System.out.println("send："+ConvertUtils.addSpace(queryAfter));*/
                         sleep(5000);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -88,6 +92,8 @@ public class SocketClient {
         try {
             new SocketClient();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
             e.printStackTrace();
         }
     }

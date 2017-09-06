@@ -68,18 +68,13 @@ public class DataHandle {
     private double FZYS5 = -1;
     private double FZYS6 = -1;
     private Logger log = Logger.getLogger(DataHandle.class);
-static int j =1;
-static int k =1;
-static int m =1;
     static {
         SqlHelper.connPool = new DBConnectionPool(30);
     }
     /** 存储数据到数据库*/
     public  DataHandle(){
-        log.info("************************m"+m++);
         Runnable runnable = new Runnable() {
             public void run() {
-                log.info("**************************k"+k++);
                 DBConnection conn = SqlHelper.connPool.getConnection();
                 String sql = "INSERT INTO T_MICROGRID_COLLECT (DCU,DCI,SDPL,BLWZT,GZDM,QTBZ,GZMS,ZCDL,ZFDL,SZDMS,SDUA,SDUB,SDUC,SDIA,CNIA,GFIA,FZIA1,FZIA2,FZIA3,FZIA4,FZIA5,FZIA6,SDGL,CNGL,GFGL,FZGL1,FZGL2,FZGL3,FZGL4,FZGL5,FZGL6,SDWG,CNWG,GFWG,FZWG1,FZWG2,FZWG3,FZWG4,FZWG5,FZWG6,SDYS,CNYS,GFYS,FZYS1,FZYS2,FZYS3,FZYS4,FZYS5,FZYS6) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 Parameter[] parameter = new Parameter[49];
@@ -136,7 +131,6 @@ static int m =1;
                 i = 0;
                 try {
                     SqlHelper.executeNonQuery(conn, CommandType.Text,sql,parameter);
-                    log.info("******************************j"+j++);
                 } catch (Exception e) {
                     log.debug("存储数据出错！",e);
                 }
