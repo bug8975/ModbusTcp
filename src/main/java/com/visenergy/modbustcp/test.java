@@ -25,19 +25,12 @@ public class test {
     static OutputStream os = null;
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(3000);
-<<<<<<< HEAD
-            Socket socket = serverSocket.accept();
-            is = socket.getInputStream();
-            os = socket.getOutputStream();
-=======
-
 
         Socket socket = serverSocket.accept();
         System.out.println("连接：" + socket.getInetAddress());
         is = socket.getInputStream();
         os = socket.getOutputStream();
 
->>>>>>> master
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
