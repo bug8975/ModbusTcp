@@ -1,1 +1,3 @@
 ModbusTcp
+
+小微网使用modbusTCP方式进行采集

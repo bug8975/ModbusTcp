@@ -69,7 +69,7 @@ public class DataHandle {
     private double FZYS6 = -1;
     private Logger log = Logger.getLogger(DataHandle.class);
     static {
-        SqlHelper.connPool = new DBConnectionPool(30);
+        SqlHelper.connPool = new DBConnectionPool(10);
     }
     /** 存储数据到数据库*/
     public  DataHandle(){
@@ -139,9 +139,6 @@ public class DataHandle {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(runnable,0,30, TimeUnit.SECONDS);
     }
-
-
-
 
     public int getDCU() {
         return DCU;

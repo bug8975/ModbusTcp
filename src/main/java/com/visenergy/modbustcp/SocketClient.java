@@ -14,7 +14,7 @@ import com.visenergy.utils.*;
  * @Time 15:05:13
  */
 public class SocketClient {
-    private final String remoteIp = "192.168.100.11";
+    private final String remoteIp = "192.168.100.151";
     private final int port = 3000;
     Socket socket = null;
     static InputStream is = null;
