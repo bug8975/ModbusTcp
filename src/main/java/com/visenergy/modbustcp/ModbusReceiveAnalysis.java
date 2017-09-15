@@ -122,7 +122,7 @@ public class ModbusReceiveAnalysis {
             dataHandle.setSZDMS(SZDMS);
             JSONObject jsonObject = JSONObject.fromObject(map);
             RabbitMqUtils.sendMq(getChannel(), "STATUS", jsonObject.toString());
-        } else if (lenth == 93) {
+        } else if (lenth == 101) {
             BigDecimal SDGLA = new BigDecimal((byte) Integer.parseInt(answer[45].concat(answer[46]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal SDGLB = new BigDecimal((byte) Integer.parseInt(answer[47].concat(answer[48]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal SDGLC = new BigDecimal((byte) Integer.parseInt(answer[49].concat(answer[50]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
@@ -150,7 +150,7 @@ public class ModbusReceiveAnalysis {
             BigDecimal FZGL6A = new BigDecimal((byte) Integer.parseInt(answer[93].concat(answer[94]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal FZGL6B = new BigDecimal((byte) Integer.parseInt(answer[95].concat(answer[96]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal FZGL6C = new BigDecimal((byte) Integer.parseInt(answer[97].concat(answer[98]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-
+            BigDecimal CNUA = new BigDecimal(Integer.parseInt(answer[105].concat(answer[106]),16)).multiply(new BigDecimal("0.1"));
             BigDecimal SDGL = SDGLA.add(SDGLB).add(SDGLC);
             BigDecimal CNGL = CNGLA.add(CNGLB).add(CNGLC);
             BigDecimal GFGL = GFGLA.add(GFGLB).add(GFGLC);
@@ -181,6 +181,7 @@ public class ModbusReceiveAnalysis {
             arrayFZGL5[arrayFZGL5.length - 1] = FZGL5.intValue();
             arrayFZGL6[arrayFZGL6.length - 1] = FZGL6.intValue();
 
+            log.debug("储能A相电压：" + CNUA);
             log.debug("市电A相有功功率：" + SDGLA);
             log.debug("市电B相有功功率：" + SDGLB);
             log.debug("市电C相有功功率：" + SDGLC);
@@ -209,6 +210,7 @@ public class ModbusReceiveAnalysis {
             log.debug("六负载B相有功功率：" + FZGL6B);
             log.debug("六负载C相有功功率：" + FZGL6C);
             Map map = new HashMap();
+            map.put("CNUA",CNUA);
             map.put("SDGL", SDGL);
             map.put("CNGL", CNGL);
             map.put("GFGL", GFGL);
