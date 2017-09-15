@@ -20,9 +20,7 @@ public class RequestPowerCurve {
     private static Logger log = Logger.getLogger(RequestPowerCurve.class);
 
     public RequestPowerCurve() throws IOException, TimeoutException {
-       /* RabbitMqUtils.sendMq(getChannel2(),"REQUEST","");
-        RabbitMqUtils.sendMq(getChannel2(),"SWITCH","FZ6_ON");
-        RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS","");*/
+
     }
     static {
         try {
@@ -64,15 +62,6 @@ public class RequestPowerCurve {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     message = new String(body,"UTF-8");
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("SDKG",ModbusReceiveAnalysis.SDKG);
-                    jsonObject.put("CNKG",ModbusReceiveAnalysis.CNKG);
-                    jsonObject.put("GFKG",ModbusReceiveAnalysis.GFKG);
-                    jsonObject.put("FZKG1",ModbusReceiveAnalysis.FZKG1);
-                    jsonObject.put("FZKG2",ModbusReceiveAnalysis.FZKG2);
-                    jsonObject.put("FZKG3",ModbusReceiveAnalysis.FZKG3);
-                    jsonObject.put("FZKG4",ModbusReceiveAnalysis.FZKG4);
-                    jsonObject.put("FZKG5",ModbusReceiveAnalysis.FZKG5);
-                    jsonObject.put("FZKG6",ModbusReceiveAnalysis.FZKG6);
                     jsonObject.put("BLWZT",ModbusReceiveAnalysis.BLWZT);
                     try {
                         RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS_RETURN",jsonObject.toString());
@@ -104,5 +93,13 @@ public class RequestPowerCurve {
             e.printStackTrace();
         }
         return channel;
+    }
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        RabbitMqUtils.sendMq(getChannel2(),"PV_YC","");
+        RabbitMqUtils.sendMq(getChannel2(),"PV_YXSTATUS","");
+        RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS","");
+        RabbitMqUtils.sendMq(getChannel2(),"SWITCH","");
+        RabbitMqUtils.sendMq(getChannel2(),"REQUEST","");
     }
 }

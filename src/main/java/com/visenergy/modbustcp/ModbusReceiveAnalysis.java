@@ -1,18 +1,13 @@
 package com.visenergy.modbustcp;
 
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOServer;
-import com.flying.jdbc.data.Parameter;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.visenergy.rabbitmq.RabbitMqUtils;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -36,17 +31,7 @@ public class ModbusReceiveAnalysis {
     protected static Integer[] arrayFZGL4 = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     protected static Integer[] arrayFZGL5 = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     protected static Integer[] arrayFZGL6 = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    protected static int SDKG;//市电开关
-    protected static int CNKG;//储能开关
-    protected static int GFKG;//光伏开关
-    protected static int FZKG1;//负载1开关
-    protected static int FZKG2;//负载2开关
-    protected static int FZKG3;//负载3开关
-    protected static int FZKG4;//负载4开关
-    protected static int FZKG5;//负载5开关
-    protected static int FZKG6;//负载6开关
     protected static int BLWZT;//并离网状态
-
 
     /**
      * 数据解析
@@ -57,7 +42,6 @@ public class ModbusReceiveAnalysis {
     public static void analysis(String data) throws IOException, TimeoutException {
 
         String[] answer = data.split(" ");
-//        int lenth = new BigInteger(answer[5],16).intValue() <0 ? new BigInteger(answer[5],16).intValue()+256:new BigInteger(answer[5],16).intValue();
         int lenth = Integer.parseInt(answer[5], 16) < 0 ? Integer.parseInt(answer[5], 16) + 256 : Integer.parseInt(answer[5], 16);
         if (lenth == 57) {
             int DCU = Integer.parseInt(answer[9].concat(answer[10]), 16);
@@ -111,6 +95,9 @@ public class ModbusReceiveAnalysis {
             map.put("SDUA", SDUA);
             map.put("SDUB", SDUB);
             map.put("SDUC", SDUC);
+            map.put("CNUA", CNUA);
+            map.put("CNUB", CNUB);
+            map.put("CNUC", CNUC);
             map.put("SDPL", SDPL);
             map.put("NBXL", NBXL);
             map.put("BLWZT", BLWZT);
@@ -136,16 +123,43 @@ public class ModbusReceiveAnalysis {
             JSONObject jsonObject = JSONObject.fromObject(map);
             RabbitMqUtils.sendMq(getChannel(), "STATUS", jsonObject.toString());
         } else if (lenth == 93) {
-            int SDGL = ((byte) Integer.parseInt(answer[45].concat(answer[46]), 16)) + ((byte) Integer.parseInt(answer[47].concat(answer[48]), 16)) + ((byte) Integer.parseInt(answer[49].concat(answer[50]), 16));
-            int CNGL = ((byte) Integer.parseInt(answer[51].concat(answer[52]), 16)) + ((byte) Integer.parseInt(answer[53].concat(answer[54]), 16)) + ((byte) Integer.parseInt(answer[55].concat(answer[56]), 16));
-            int GFGL = ((byte) Integer.parseInt(answer[57].concat(answer[58]), 16)) + ((byte) Integer.parseInt(answer[59].concat(answer[60]), 16)) + ((byte) Integer.parseInt(answer[61].concat(answer[62]), 16));
-            int FZGL1 = ((byte) Integer.parseInt(answer[63].concat(answer[64]), 16)) + ((byte) Integer.parseInt(answer[65].concat(answer[66]), 16)) + ((byte) Integer.parseInt(answer[67].concat(answer[68]), 16));
-            int FZGL2 = ((byte) Integer.parseInt(answer[69].concat(answer[70]), 16)) + ((byte) Integer.parseInt(answer[71].concat(answer[72]), 16)) + ((byte) Integer.parseInt(answer[73].concat(answer[74]), 16));
-            int FZGL3 = ((byte) Integer.parseInt(answer[75].concat(answer[76]), 16)) + ((byte) Integer.parseInt(answer[77].concat(answer[78]), 16)) + ((byte) Integer.parseInt(answer[79].concat(answer[80]), 16));
-            int FZGL4 = ((byte) Integer.parseInt(answer[81].concat(answer[82]), 16)) + ((byte) Integer.parseInt(answer[83].concat(answer[84]), 16)) + ((byte) Integer.parseInt(answer[85].concat(answer[86]), 16));
-            int FZGL5 = ((byte) Integer.parseInt(answer[87].concat(answer[88]), 16)) + ((byte) Integer.parseInt(answer[89].concat(answer[90]), 16)) + ((byte) Integer.parseInt(answer[91].concat(answer[92]), 16));
-            int FZGL6 = ((byte) Integer.parseInt(answer[93].concat(answer[94]), 16)) + ((byte) Integer.parseInt(answer[95].concat(answer[96]), 16)) + ((byte) Integer.parseInt(answer[97].concat(answer[98]), 16));
+            BigDecimal SDGLA = new BigDecimal((byte) Integer.parseInt(answer[45].concat(answer[46]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal SDGLB = new BigDecimal((byte) Integer.parseInt(answer[47].concat(answer[48]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal SDGLC = new BigDecimal((byte) Integer.parseInt(answer[49].concat(answer[50]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLA = new BigDecimal((byte) Integer.parseInt(answer[51].concat(answer[52]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLB = new BigDecimal((byte) Integer.parseInt(answer[53].concat(answer[54]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLC = new BigDecimal((byte) Integer.parseInt(answer[55].concat(answer[56]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLA = new BigDecimal((byte) Integer.parseInt(answer[57].concat(answer[58]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLB = new BigDecimal((byte) Integer.parseInt(answer[59].concat(answer[60]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLC = new BigDecimal((byte) Integer.parseInt(answer[61].concat(answer[62]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1A = new BigDecimal((byte) Integer.parseInt(answer[63].concat(answer[64]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1B = new BigDecimal((byte) Integer.parseInt(answer[65].concat(answer[66]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1C = new BigDecimal((byte) Integer.parseInt(answer[67].concat(answer[68]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2A = new BigDecimal((byte) Integer.parseInt(answer[69].concat(answer[70]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2B = new BigDecimal((byte) Integer.parseInt(answer[71].concat(answer[72]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2C = new BigDecimal((byte) Integer.parseInt(answer[73].concat(answer[74]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3A = new BigDecimal((byte) Integer.parseInt(answer[75].concat(answer[76]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3B = new BigDecimal((byte) Integer.parseInt(answer[77].concat(answer[78]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3C = new BigDecimal((byte) Integer.parseInt(answer[79].concat(answer[80]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4A = new BigDecimal((byte) Integer.parseInt(answer[81].concat(answer[82]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4B = new BigDecimal((byte) Integer.parseInt(answer[83].concat(answer[84]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4C = new BigDecimal((byte) Integer.parseInt(answer[85].concat(answer[86]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5A = new BigDecimal((byte) Integer.parseInt(answer[87].concat(answer[88]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5B = new BigDecimal((byte) Integer.parseInt(answer[89].concat(answer[90]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5C = new BigDecimal((byte) Integer.parseInt(answer[91].concat(answer[92]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6A = new BigDecimal((byte) Integer.parseInt(answer[93].concat(answer[94]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6B = new BigDecimal((byte) Integer.parseInt(answer[95].concat(answer[96]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6C = new BigDecimal((byte) Integer.parseInt(answer[97].concat(answer[98]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
 
+            BigDecimal SDGL = SDGLA.add(SDGLB).add(SDGLC);
+            BigDecimal CNGL = CNGLA.add(CNGLB).add(CNGLC);
+            BigDecimal GFGL = GFGLA.add(GFGLB).add(GFGLC);
+            BigDecimal FZGL1 = FZGL1A.add(FZGL1B).add(FZGL1C);
+            BigDecimal FZGL2 = FZGL2A.add(FZGL2B).add(FZGL2C);
+            BigDecimal FZGL3 = FZGL3A.add(FZGL3B).add(FZGL3C);
+            BigDecimal FZGL4 = FZGL4A.add(FZGL4B).add(FZGL4C);
+            BigDecimal FZGL5 = FZGL5A.add(FZGL5B).add(FZGL5C);
+            BigDecimal FZGL6 = FZGL6A.add(FZGL6B).add(FZGL6C);
             for (int i = 0; i < arraySDGL.length - 1; i++) {
                 arraySDGL[i] = arraySDGL[i + 1];
                 arrayCNGL[i] = arrayCNGL[i + 1];
@@ -157,71 +171,44 @@ public class ModbusReceiveAnalysis {
                 arrayFZGL5[i] = arrayFZGL5[i + 1];
                 arrayFZGL6[i] = arrayFZGL6[i + 1];
             }
-            arraySDGL[arraySDGL.length - 1] = SDGL;
-            arrayCNGL[arrayCNGL.length - 1] = CNGL;
-            arrayGFGL[arrayGFGL.length - 1] = GFGL;
-            arrayFZGL1[arrayFZGL1.length - 1] = FZGL1;
-            arrayFZGL2[arrayFZGL2.length - 1] = FZGL2;
-            arrayFZGL3[arrayFZGL3.length - 1] = FZGL3;
-            arrayFZGL4[arrayFZGL4.length - 1] = FZGL4;
-            arrayFZGL5[arrayFZGL5.length - 1] = FZGL5;
-            arrayFZGL6[arrayFZGL6.length - 1] = FZGL6;
+            arraySDGL[arraySDGL.length - 1] = SDGL.intValue();
+            arrayCNGL[arrayCNGL.length - 1] = CNGL.intValue();
+            arrayGFGL[arrayGFGL.length - 1] = GFGL.intValue();
+            arrayFZGL1[arrayFZGL1.length - 1] = FZGL1.intValue();
+            arrayFZGL2[arrayFZGL2.length - 1] = FZGL2.intValue();
+            arrayFZGL3[arrayFZGL3.length - 1] = FZGL3.intValue();
+            arrayFZGL4[arrayFZGL4.length - 1] = FZGL4.intValue();
+            arrayFZGL5[arrayFZGL5.length - 1] = FZGL5.intValue();
+            arrayFZGL6[arrayFZGL6.length - 1] = FZGL6.intValue();
 
-            SDKG = Integer.parseInt(answer[9].concat(answer[10]), 16);
-            CNKG = Integer.parseInt(answer[13].concat(answer[14]), 16);
-            GFKG = Integer.parseInt(answer[17].concat(answer[18]), 16);
-            FZKG1 = Integer.parseInt(answer[21].concat(answer[22]), 16);
-            FZKG2 = Integer.parseInt(answer[25].concat(answer[26]), 16);
-            FZKG3 = Integer.parseInt(answer[29].concat(answer[30]), 16);
-            FZKG4 = Integer.parseInt(answer[33].concat(answer[34]), 16);
-            FZKG5 = Integer.parseInt(answer[37].concat(answer[38]), 16);
-            FZKG6 = Integer.parseInt(answer[41].concat(answer[42]), 16);
-            log.debug("市电投入状态：" + Integer.parseInt(answer[9].concat(answer[10]), 16));
-            log.debug("储能投入状态：" + Integer.parseInt(answer[13].concat(answer[14]), 16));
-            log.debug("光伏投入状态：" + Integer.parseInt(answer[17].concat(answer[18]), 16));
-            log.debug("1负载投入状态：" + Integer.parseInt(answer[21].concat(answer[22]), 16));
-            log.debug("2负载投入状态：" + Integer.parseInt(answer[25].concat(answer[26]), 16));
-            log.debug("3负载投入状态：" + Integer.parseInt(answer[29].concat(answer[30]), 16));
-            log.debug("4负载投入状态：" + Integer.parseInt(answer[33].concat(answer[34]), 16));
-            log.debug("5负载投入状态：" + Integer.parseInt(answer[37].concat(answer[38]), 16));
-            log.debug("6负载投入状态：" + Integer.parseInt(answer[41].concat(answer[42]), 16));
-            log.debug("市电A相有功功率：" + (byte) Integer.parseInt(answer[45].concat(answer[46]), 16));
-            log.debug("市电B相有功功率：" + (byte) Integer.parseInt(answer[47].concat(answer[48]), 16));
-            log.debug("市电C相有功功率：" + (byte) Integer.parseInt(answer[49].concat(answer[50]), 16));
-            log.debug("储能A相有功功率：" + (byte) Integer.parseInt(answer[51].concat(answer[52]), 16));
-            log.debug("储能B相有功功率：" + (byte) Integer.parseInt(answer[53].concat(answer[54]), 16));
-            log.debug("储能C相有功功率：" + (byte) Integer.parseInt(answer[55].concat(answer[56]), 16));
-            log.debug("光伏A相有功功率：" + (byte) Integer.parseInt(answer[57].concat(answer[58]), 16));
-            log.debug("光伏B相有功功率：" + (byte) Integer.parseInt(answer[59].concat(answer[60]), 16));
-            log.debug("光伏C相有功功率：" + (byte) Integer.parseInt(answer[61].concat(answer[62]), 16));
-            log.debug("一负载A相有功功率：" + (byte) Integer.parseInt(answer[63].concat(answer[64]), 16));
-            log.debug("一负载B相有功功率：" + (byte) Integer.parseInt(answer[65].concat(answer[66]), 16));
-            log.debug("一负载C相有功功率：" + (byte) Integer.parseInt(answer[67].concat(answer[68]), 16));
-            log.debug("二负载A相有功功率：" + (byte) Integer.parseInt(answer[69].concat(answer[70]), 16));
-            log.debug("二负载B相有功功率：" + (byte) Integer.parseInt(answer[71].concat(answer[72]), 16));
-            log.debug("二负载C相有功功率：" + (byte) Integer.parseInt(answer[73].concat(answer[74]), 16));
-            log.debug("三负载A相有功功率：" + (byte) Integer.parseInt(answer[75].concat(answer[76]), 16));
-            log.debug("三负载B相有功功率：" + (byte) Integer.parseInt(answer[77].concat(answer[78]), 16));
-            log.debug("三负载C相有功功率：" + (byte) Integer.parseInt(answer[79].concat(answer[80]), 16));
-            log.debug("四负载A相有功功率：" + (byte) Integer.parseInt(answer[81].concat(answer[82]), 16));
-            log.debug("四负载B相有功功率：" + (byte) Integer.parseInt(answer[83].concat(answer[84]), 16));
-            log.debug("四负载B相有功功率：" + (byte) Integer.parseInt(answer[85].concat(answer[86]), 16));
-            log.debug("五负载A相有功功率：" + (byte) Integer.parseInt(answer[87].concat(answer[88]), 16));
-            log.debug("五负载B相有功功率：" + (byte) Integer.parseInt(answer[89].concat(answer[90]), 16));
-            log.debug("五负载C相有功功率：" + (byte) Integer.parseInt(answer[91].concat(answer[92]), 16));
-            log.debug("六负载A相有功功率：" + (byte) Integer.parseInt(answer[93].concat(answer[94]), 16));
-            log.debug("六负载B相有功功率：" + (byte) Integer.parseInt(answer[95].concat(answer[96]), 16));
-            log.debug("六负载C相有功功率：" + (byte) Integer.parseInt(answer[97].concat(answer[98]), 16));
+            log.debug("市电A相有功功率：" + SDGLA);
+            log.debug("市电B相有功功率：" + SDGLB);
+            log.debug("市电C相有功功率：" + SDGLC);
+            log.debug("储能A相有功功率：" + CNGLA);
+            log.debug("储能B相有功功率：" + CNGLB);
+            log.debug("储能C相有功功率：" + CNGLC);
+            log.debug("光伏A相有功功率：" + GFGLA);
+            log.debug("光伏B相有功功率：" + GFGLB);
+            log.debug("光伏C相有功功率：" + GFGLC);
+            log.debug("一负载A相有功功率：" + FZGL1A);
+            log.debug("一负载B相有功功率：" + FZGL1B);
+            log.debug("一负载C相有功功率：" + FZGL1C);
+            log.debug("二负载A相有功功率：" + FZGL2A);
+            log.debug("二负载B相有功功率：" + FZGL2B);
+            log.debug("二负载C相有功功率：" + FZGL2C);
+            log.debug("三负载A相有功功率：" + FZGL3A);
+            log.debug("三负载B相有功功率：" + FZGL3B);
+            log.debug("三负载C相有功功率：" + FZGL3C);
+            log.debug("四负载A相有功功率：" + FZGL4A);
+            log.debug("四负载B相有功功率：" + FZGL4B);
+            log.debug("四负载B相有功功率：" + FZGL4C);
+            log.debug("五负载A相有功功率：" + FZGL5A);
+            log.debug("五负载B相有功功率：" + FZGL5B);
+            log.debug("五负载C相有功功率：" + FZGL5C);
+            log.debug("六负载A相有功功率：" + FZGL6A);
+            log.debug("六负载B相有功功率：" + FZGL6B);
+            log.debug("六负载C相有功功率：" + FZGL6C);
             Map map = new HashMap();
-            map.put("SDKG", SDKG);
-            map.put("CNKG", CNKG);
-            map.put("GFKG", GFKG);
-            map.put("FZKG1", FZKG1);
-            map.put("FZKG2", FZKG2);
-            map.put("FZKG3", FZKG3);
-            map.put("FZKG4", FZKG4);
-            map.put("FZKG5", FZKG5);
-            map.put("FZKG6", FZKG6);
             map.put("SDGL", SDGL);
             map.put("CNGL", CNGL);
             map.put("GFGL", GFGL);
@@ -231,15 +218,15 @@ public class ModbusReceiveAnalysis {
             map.put("FZGL4", FZGL4);
             map.put("FZGL5", FZGL5);
             map.put("FZGL6", FZGL6);
-            dataHandle.setSDGL(SDGL);
-            dataHandle.setCNGL(CNGL);
-            dataHandle.setGFGL(GFGL);
-            dataHandle.setFZGL1(FZGL1);
-            dataHandle.setFZGL2(FZGL2);
-            dataHandle.setFZGL3(FZGL3);
-            dataHandle.setFZGL4(FZGL4);
-            dataHandle.setFZGL5(FZGL5);
-            dataHandle.setFZGL6(FZGL6);
+            dataHandle.setSDGL(SDGL.intValue());
+            dataHandle.setCNGL(CNGL.intValue());
+            dataHandle.setGFGL(GFGL.intValue());
+            dataHandle.setFZGL1(FZGL1.intValue());
+            dataHandle.setFZGL2(FZGL2.intValue());
+            dataHandle.setFZGL3(FZGL3.intValue());
+            dataHandle.setFZGL4(FZGL4.intValue());
+            dataHandle.setFZGL5(FZGL5.intValue());
+            dataHandle.setFZGL6(FZGL6.intValue());
             JSONObject jsonObject = JSONObject.fromObject(map);
             RabbitMqUtils.sendMq(getChannel(), "POWER", jsonObject.toString());
         } else if (lenth == 207) {
@@ -415,6 +402,15 @@ public class ModbusReceiveAnalysis {
             log.debug("六负载C相功率因素：" + new BigDecimal(Convert(answer[211], (answer[212]))).multiply(new BigDecimal("0.0001")).setScale(2, BigDecimal.ROUND_DOWN));
 
             Map map = new HashMap();
+            map.put("GFUA", GFUA);
+            map.put("FZUA1", FZUA1);
+            map.put("FZUA2", FZUA2);
+            map.put("FZUA3", FZUA3);
+            map.put("FZUA4", FZUA4);
+            map.put("FZUA5", FZUA5);
+            map.put("FZUA6", FZUA6);
+            map.put("SDIA", SDIA);
+            map.put("SDIA", SDIA);
             map.put("SDIA", SDIA);
             map.put("SDIB", SDIB);
             map.put("SDIC", SDIC);
@@ -490,7 +486,17 @@ public class ModbusReceiveAnalysis {
             JSONObject jsonObject = JSONObject.fromObject(map);
             RabbitMqUtils.sendMq(getChannel(), "VOLTAGE_CURRENT", jsonObject.toString());
         } else if (lenth == 6) {
-            RabbitMqUtils.sendMq(getChannel(), "SWITCH_RETURN", "SUCCESS");
+           int address = Integer.parseInt(answer[9],16);
+           Map<Integer,String> addressAndSwitchName = ModbusReceiveAnalysis.addressAndSwitchName();
+           String switchName;
+           for (Map.Entry<Integer,String> entry : addressAndSwitchName.entrySet()){
+               if (address == entry.getKey()){
+                   switchName = addressAndSwitchName.get(entry.getKey());
+                   RabbitMqUtils.sendMq(getChannel(), "SUCCESS", switchName);
+                   break;
+               }
+           }
+
         } else {
             log.error("返回的数据格式不对，无法解析!");
         }
@@ -520,6 +526,28 @@ public class ModbusReceiveAnalysis {
         return result;
     }
 
+    private static Map<Integer,String> addressAndSwitchName(){
+        Map<Integer,String> map = new HashMap();
+        map.put(39,"SD_ON");
+        map.put(40,"SD_OFF");
+        map.put(41,"CN_ON");
+        map.put(42,"CN_OFF");
+        map.put(43,"GF_ON");
+        map.put(44,"GF_OFF");
+        map.put(45,"FZ1_ON");
+        map.put(46,"FZ1_OFF");
+        map.put(47,"FZ2_ON");
+        map.put(48,"FZ2_OFF");
+        map.put(49,"FZ3_ON");
+        map.put(50,"FZ3_OFF");
+        map.put(51,"FZ4_ON");
+        map.put(52,"FZ4_OFF");
+        map.put(53,"FZ5_ON");
+        map.put(54,"FZ5_OFF");
+        map.put(55,"FZ6_ON");
+        map.put(56,"FZ6_OFF");
+        return map;
+    }
     public static Channel getChannel() {
         try {
             if (conn == null) {
