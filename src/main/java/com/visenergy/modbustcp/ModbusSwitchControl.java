@@ -85,9 +85,7 @@ public class ModbusSwitchControl {
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
                     } else if (message.equals("GF_ON")) {
                         String address = prop.getProperty("GFTR");
-                        log.info("*****************"+address);
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
-                        log.info("***************光伏开关"+ConvertUtils.hexStringToBytes(generateCommand(address)));
                     } else if (message.equals("GF_OFF")) {
                         String address = prop.getProperty("GFQC");
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));

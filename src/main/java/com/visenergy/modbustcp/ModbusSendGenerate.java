@@ -25,9 +25,9 @@ public class ModbusSendGenerate {
         query.append("01");
         query.append("03");
         query.append("00");
-        query.append(Integer.toHexString(56));
+        query.append(Integer.toHexString(39));
         query.append("00");
-        query.append(Integer.toHexString(28));
+        query.append(Integer.toHexString(45));
         return query.toString();
     }
     public static String queryAfter(){
@@ -37,7 +37,7 @@ public class ModbusSendGenerate {
         query.append("00");
         query.append(Integer.toHexString(90));
         query.append("00");
-        query.append(Integer.toHexString(192));
+        query.append(Integer.toHexString(102));
         return query.toString();
     }
     /**

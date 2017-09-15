@@ -20,7 +20,9 @@ public class RequestPowerCurve {
     private static Logger log = Logger.getLogger(RequestPowerCurve.class);
 
     public RequestPowerCurve() throws IOException, TimeoutException {
-        RabbitMqUtils.sendMq(getChannel2(),"REQUEST","");
+       /* RabbitMqUtils.sendMq(getChannel2(),"REQUEST","");
+        RabbitMqUtils.sendMq(getChannel2(),"SWITCH","FZ6_ON");
+        RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS","");*/
     }
     static {
         try {

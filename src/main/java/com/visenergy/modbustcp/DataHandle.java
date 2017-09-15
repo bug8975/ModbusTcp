@@ -31,15 +31,15 @@ public class DataHandle {
     private double SDUA = -1;
     private double SDUB = -1;
     private double SDUC = -1;
-    private int SDIA = -1;
-    private int CNIA = -1;
-    private int GFIA = -1;
-    private int FZIA1 = -1;
-    private int FZIA2 = -1;
-    private int FZIA3 = -1;
-    private int FZIA4 = -1;
-    private int FZIA5 = -1;
-    private int FZIA6 = -1;
+    private double SDIA = -1;
+    private double CNIA = -1;
+    private double GFIA = -1;
+    private double FZIA1 = -1;
+    private double FZIA2 = -1;
+    private double FZIA3 = -1;
+    private double FZIA4 = -1;
+    private double FZIA5 = -1;
+    private double FZIA6 = -1;
     private double SDGL = -1;
     private double CNGL = -1;
     private double GFGL = -1;
@@ -92,15 +92,15 @@ public class DataHandle {
                 parameter[i++] = new Parameter("SDUA", BaseTypes.DECIMAL,SDUA);
                 parameter[i++] = new Parameter("SDUB", BaseTypes.DECIMAL,SDUB);
                 parameter[i++] = new Parameter("SDUC", BaseTypes.DECIMAL,SDUC);
-                parameter[i++] = new Parameter("SDIA", BaseTypes.BIGINT,SDIA);
-                parameter[i++] = new Parameter("CNIA", BaseTypes.BIGINT,CNIA);
-                parameter[i++] = new Parameter("GFIA", BaseTypes.BIGINT,GFIA);
-                parameter[i++] = new Parameter("FZIA1", BaseTypes.BIGINT,FZIA1);
-                parameter[i++] = new Parameter("FZIA2", BaseTypes.BIGINT,FZIA2);
-                parameter[i++] = new Parameter("FZIA3", BaseTypes.BIGINT,FZIA3);
-                parameter[i++] = new Parameter("FZIA4", BaseTypes.BIGINT,FZIA4);
-                parameter[i++] = new Parameter("FZIA5", BaseTypes.BIGINT,FZIA5);
-                parameter[i++] = new Parameter("FZIA6", BaseTypes.BIGINT,FZIA6);
+                parameter[i++] = new Parameter("SDIA", BaseTypes.DECIMAL,SDIA);
+                parameter[i++] = new Parameter("CNIA", BaseTypes.DECIMAL,CNIA);
+                parameter[i++] = new Parameter("GFIA", BaseTypes.DECIMAL,GFIA);
+                parameter[i++] = new Parameter("FZIA1", BaseTypes.DECIMAL,FZIA1);
+                parameter[i++] = new Parameter("FZIA2", BaseTypes.DECIMAL,FZIA2);
+                parameter[i++] = new Parameter("FZIA3", BaseTypes.DECIMAL,FZIA3);
+                parameter[i++] = new Parameter("FZIA4", BaseTypes.DECIMAL,FZIA4);
+                parameter[i++] = new Parameter("FZIA5", BaseTypes.DECIMAL,FZIA5);
+                parameter[i++] = new Parameter("FZIA6", BaseTypes.DECIMAL,FZIA6);
                 parameter[i++] = new Parameter("SDGL", BaseTypes.DECIMAL,SDGL);
                 parameter[i++] = new Parameter("CNGL", BaseTypes.DECIMAL,CNGL);
                 parameter[i++] = new Parameter("GFGL", BaseTypes.DECIMAL,GFGL);
@@ -156,20 +156,20 @@ public class DataHandle {
         this.DCI = DCI;
     }
 
-    public int getBLWZT() {
-        return BLWZT;
-    }
-
-    public void setBLWZT(int BLWZT) {
-        this.BLWZT = BLWZT;
-    }
-
     public double getSDPL() {
         return SDPL;
     }
 
     public void setSDPL(double SDPL) {
         this.SDPL = SDPL;
+    }
+
+    public int getBLWZT() {
+        return BLWZT;
+    }
+
+    public void setBLWZT(int BLWZT) {
+        this.BLWZT = BLWZT;
     }
 
     public int getGZDM() {
@@ -244,75 +244,75 @@ public class DataHandle {
         this.SDUC = SDUC;
     }
 
-    public int getSDIA() {
+    public double getSDIA() {
         return SDIA;
     }
 
-    public void setSDIA(int SDIA) {
+    public void setSDIA(double SDIA) {
         this.SDIA = SDIA;
     }
 
-    public int getCNIA() {
+    public double getCNIA() {
         return CNIA;
     }
 
-    public void setCNIA(int CNIA) {
+    public void setCNIA(double CNIA) {
         this.CNIA = CNIA;
     }
 
-    public int getGFIA() {
+    public double getGFIA() {
         return GFIA;
     }
 
-    public void setGFIA(int GFIA) {
+    public void setGFIA(double GFIA) {
         this.GFIA = GFIA;
     }
 
-    public int getFZIA1() {
+    public double getFZIA1() {
         return FZIA1;
     }
 
-    public void setFZIA1(int FZIA1) {
+    public void setFZIA1(double FZIA1) {
         this.FZIA1 = FZIA1;
     }
 
-    public int getFZIA2() {
+    public double getFZIA2() {
         return FZIA2;
     }
 
-    public void setFZIA2(int FZIA2) {
+    public void setFZIA2(double FZIA2) {
         this.FZIA2 = FZIA2;
     }
 
-    public int getFZIA3() {
+    public double getFZIA3() {
         return FZIA3;
     }
 
-    public void setFZIA3(int FZIA3) {
+    public void setFZIA3(double FZIA3) {
         this.FZIA3 = FZIA3;
     }
 
-    public int getFZIA4() {
+    public double getFZIA4() {
         return FZIA4;
     }
 
-    public void setFZIA4(int FZIA4) {
+    public void setFZIA4(double FZIA4) {
         this.FZIA4 = FZIA4;
     }
 
-    public int getFZIA5() {
+    public double getFZIA5() {
         return FZIA5;
     }
 
-    public void setFZIA5(int FZIA5) {
+    public void setFZIA5(double FZIA5) {
         this.FZIA5 = FZIA5;
     }
 
-    public int getFZIA6() {
+    public double getFZIA6() {
         return FZIA6;
     }
 
-    public void setFZIA6(int FZIA6) {
+    public void setFZIA6(double FZIA6) {
         this.FZIA6 = FZIA6;
     }
 
