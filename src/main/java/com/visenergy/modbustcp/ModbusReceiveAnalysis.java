@@ -123,33 +123,33 @@ public class ModbusReceiveAnalysis {
             JSONObject jsonObject = JSONObject.fromObject(map);
             RabbitMqUtils.sendMq(getChannel(), "STATUS", jsonObject.toString());
         } else if (lenth == 101) {
-            BigDecimal SDGLA = new BigDecimal((byte) Integer.parseInt(answer[45].concat(answer[46]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal SDGLB = new BigDecimal((byte) Integer.parseInt(answer[47].concat(answer[48]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal SDGLC = new BigDecimal((byte) Integer.parseInt(answer[49].concat(answer[50]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal CNGLA = new BigDecimal((byte) Integer.parseInt(answer[51].concat(answer[52]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal CNGLB = new BigDecimal((byte) Integer.parseInt(answer[53].concat(answer[54]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal CNGLC = new BigDecimal((byte) Integer.parseInt(answer[55].concat(answer[56]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal GFGLA = new BigDecimal((byte) Integer.parseInt(answer[57].concat(answer[58]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal GFGLB = new BigDecimal((byte) Integer.parseInt(answer[59].concat(answer[60]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal GFGLC = new BigDecimal((byte) Integer.parseInt(answer[61].concat(answer[62]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL1A = new BigDecimal((byte) Integer.parseInt(answer[63].concat(answer[64]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL1B = new BigDecimal((byte) Integer.parseInt(answer[65].concat(answer[66]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL1C = new BigDecimal((byte) Integer.parseInt(answer[67].concat(answer[68]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL2A = new BigDecimal((byte) Integer.parseInt(answer[69].concat(answer[70]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL2B = new BigDecimal((byte) Integer.parseInt(answer[71].concat(answer[72]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL2C = new BigDecimal((byte) Integer.parseInt(answer[73].concat(answer[74]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL3A = new BigDecimal((byte) Integer.parseInt(answer[75].concat(answer[76]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL3B = new BigDecimal((byte) Integer.parseInt(answer[77].concat(answer[78]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL3C = new BigDecimal((byte) Integer.parseInt(answer[79].concat(answer[80]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL4A = new BigDecimal((byte) Integer.parseInt(answer[81].concat(answer[82]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL4B = new BigDecimal((byte) Integer.parseInt(answer[83].concat(answer[84]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL4C = new BigDecimal((byte) Integer.parseInt(answer[85].concat(answer[86]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL5A = new BigDecimal((byte) Integer.parseInt(answer[87].concat(answer[88]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL5B = new BigDecimal((byte) Integer.parseInt(answer[89].concat(answer[90]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL5C = new BigDecimal((byte) Integer.parseInt(answer[91].concat(answer[92]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL6A = new BigDecimal((byte) Integer.parseInt(answer[93].concat(answer[94]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL6B = new BigDecimal((byte) Integer.parseInt(answer[95].concat(answer[96]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
-            BigDecimal FZGL6C = new BigDecimal((byte) Integer.parseInt(answer[97].concat(answer[98]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal SDGLA = new BigDecimal(Integer.parseInt(answer[45].concat(answer[46]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal SDGLB = new BigDecimal(Integer.parseInt(answer[47].concat(answer[48]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal SDGLC = new BigDecimal(Integer.parseInt(answer[49].concat(answer[50]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLA = new BigDecimal(Integer.parseInt(answer[51].concat(answer[52]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLB = new BigDecimal(Integer.parseInt(answer[53].concat(answer[54]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal CNGLC = new BigDecimal(Integer.parseInt(answer[55].concat(answer[56]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLA = new BigDecimal(Integer.parseInt(answer[57].concat(answer[58]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLB = new BigDecimal(Integer.parseInt(answer[59].concat(answer[60]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal GFGLC = new BigDecimal(Integer.parseInt(answer[61].concat(answer[62]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1A = new BigDecimal(Integer.parseInt(answer[63].concat(answer[64]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1B = new BigDecimal(Integer.parseInt(answer[65].concat(answer[66]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL1C = new BigDecimal(Integer.parseInt(answer[67].concat(answer[68]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2A = new BigDecimal(Integer.parseInt(answer[69].concat(answer[70]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2B = new BigDecimal(Integer.parseInt(answer[71].concat(answer[72]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL2C = new BigDecimal(Integer.parseInt(answer[73].concat(answer[74]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3A = new BigDecimal(Integer.parseInt(answer[75].concat(answer[76]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3B = new BigDecimal(Integer.parseInt(answer[77].concat(answer[78]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL3C = new BigDecimal(Integer.parseInt(answer[79].concat(answer[80]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4A = new BigDecimal(Integer.parseInt(answer[81].concat(answer[82]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4B = new BigDecimal(Integer.parseInt(answer[83].concat(answer[84]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL4C = new BigDecimal(Integer.parseInt(answer[85].concat(answer[86]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5A = new BigDecimal(Integer.parseInt(answer[87].concat(answer[88]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5B = new BigDecimal(Integer.parseInt(answer[89].concat(answer[90]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL5C = new BigDecimal(Integer.parseInt(answer[91].concat(answer[92]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6A = new BigDecimal(Integer.parseInt(answer[93].concat(answer[94]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6B = new BigDecimal(Integer.parseInt(answer[95].concat(answer[96]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal FZGL6C = new BigDecimal(Integer.parseInt(answer[97].concat(answer[98]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal CNUA = new BigDecimal(Integer.parseInt(answer[105].concat(answer[106]),16)).multiply(new BigDecimal("0.1"));
             BigDecimal SDGL = SDGLA.add(SDGLB).add(SDGLC);
             BigDecimal CNGL = CNGLA.add(CNGLB).add(CNGLC);
@@ -510,18 +510,30 @@ public class ModbusReceiveAnalysis {
         int lowByte = Integer.parseInt(var2, 16);
         String finalHighByte;
         String finalLowByte;
-        String result = String.valueOf(Integer.parseInt(var1.concat(var2), 16));
+        int temp = Integer.parseInt(var1.concat(var2), 16);
+        if (temp > 10000)
+            temp = 10000;
+        String result = String.valueOf(temp);
         if (highByte > 127 || lowByte > 127) {
             if (highByte > 127 && lowByte > 127) {
-                finalHighByte = Integer.toHexString(256 - highByte);
-                finalLowByte = Integer.toHexString(256 - lowByte);
-                result = "-".concat(String.valueOf(Integer.parseInt(finalHighByte.concat(finalLowByte), 16)));
+                finalHighByte = Integer.toHexString(256 - highByte).length()==1 ? "0".concat(Integer.toHexString(256 - highByte)):Integer.toHexString(256 - highByte);
+                finalLowByte = Integer.toHexString(256 - lowByte).length()==1 ? "0".concat(Integer.toHexString(256 - lowByte)):Integer.toHexString(256 - lowByte);
+                int tem = Integer.parseInt(finalHighByte.concat(finalLowByte), 16);
+                if (tem > 10000)
+                    tem = 10000;
+                result = "-".concat(String.valueOf(tem));
             } else if (highByte > 127) {
-                finalHighByte = Integer.toHexString(256 - highByte);
-                result = "-".concat(String.valueOf(Integer.parseInt(finalHighByte.concat(var2), 16)));
+                finalHighByte = Integer.toHexString(256 - highByte).length()==1 ? "0".concat(Integer.toHexString(256 - highByte)):Integer.toHexString(256 - highByte);
+                int tem = Integer.parseInt(finalHighByte.concat(var2), 16);
+                if (tem > 10000)
+                    tem = 10000;
+                result = "-".concat(String.valueOf(tem));
             } else {
-                finalLowByte = Integer.toHexString(256 - lowByte);
-                result = "-".concat(String.valueOf(Integer.parseInt(var1.concat(finalLowByte), 16)));
+                finalLowByte = Integer.toHexString(256 - lowByte).length()==1 ? "0".concat(Integer.toHexString(256 - lowByte)):Integer.toHexString(256 - lowByte);
+                int tem = Integer.parseInt(var1.concat(finalLowByte), 16);
+                if (tem > 10000)
+                    tem = 10000;
+                result = "-".concat(String.valueOf(tem));
             }
             return result;
         }

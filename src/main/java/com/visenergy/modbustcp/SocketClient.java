@@ -59,9 +59,6 @@ public class SocketClient {
                 System.arraycopy(overData,0,newData,head.length,overData.length);
                 System.out.println(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
 
-                for (byte o : newData){
-                    System.out.print(o+" ");
-                }
                 try {
                     ModbusReceiveAnalysis.analysis(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
                     log.debug("开始解析");
