@@ -88,9 +88,9 @@ public class RequestPowerCurve {
                 channel = conn.createChannel();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("初始化RabbitMQ失败",e);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.error("初始化RabbitMQ失败",e);
         }
         return channel;
     }

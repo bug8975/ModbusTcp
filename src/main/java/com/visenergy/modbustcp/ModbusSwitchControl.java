@@ -108,9 +108,9 @@ public class ModbusSwitchControl {
             };
             channel.basicConsume("SWITCH",true,consumer);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.error("控制开关出现异常",e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("控制开关出现异常",e);
         }
     }
 

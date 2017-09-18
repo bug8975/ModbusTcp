@@ -57,13 +57,13 @@ public class SocketClient {
                 byte[] newData = new byte[head.length+overData.length];
                 System.arraycopy(head,0,newData,0,head.length);
                 System.arraycopy(overData,0,newData,head.length,overData.length);
-                System.out.println(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
+                log.debug(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
 
                 try {
                     ModbusReceiveAnalysis.analysis(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
                     log.debug("开始解析");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("解析出错",e);
                 }
             }
         }
@@ -84,12 +84,12 @@ public class SocketClient {
                         os.write(ConvertUtils.hexStringToBytes(queryMiddle));
                         sleep(1000);
                         os.write(ConvertUtils.hexStringToBytes(queryAfter));
-                        System.out.println("send："+ConvertUtils.addSpace(queryBefoer));
-                        System.out.println("send："+ConvertUtils.addSpace(queryMiddle));
-                        System.out.println("send："+ConvertUtils.addSpace(queryAfter));
+                        log.debug("send："+ConvertUtils.addSpace(queryBefoer));
+                        log.debug("send："+ConvertUtils.addSpace(queryMiddle));
+                        log.debug("send："+ConvertUtils.addSpace(queryAfter));
                         sleep(8000);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("写入命令出错",e);
                     }
                 }
             }
@@ -101,9 +101,9 @@ public class SocketClient {
         try {
             new SocketClient();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("启动socketClient出错",e);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.error("启动socketClient出错",e);
         }
     }
 
