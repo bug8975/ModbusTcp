@@ -49,7 +49,6 @@ public class SocketClient {
                 is.read(head,1,5);
 //                int length = Integer.parseInt((Integer.toHexString(head[4])).concat(Integer.toHexString(head[5])),16);
                 int length = head[5] < 0 ? head[5] + 256 : head[5];
-                System.out.println(length);
                 byte[] overData = new byte[length];
                 for (int i = 0; i < length; i++) {
                     overData[i] = (byte) is.read();
