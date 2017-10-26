@@ -54,17 +54,25 @@ public class ModbusSwitchControl {
                         String address = prop.getProperty("FZQC2");
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
                     } else if (message.equals("FZ3_ON")) {
-                        String address = prop.getProperty("FZTR3");
+                        /*String address = prop.getProperty("FZTR3");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));*/
+                        String address = prop.getProperty("GZFW");
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
                     } else if (message.equals("FZ3_OFF")) {
-                        String address = prop.getProperty("FZQC3");
-                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
+                        /*String address = prop.getProperty("FZQC3");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));*/
+                        String address = prop.getProperty("GZFW");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address,"","")));
                     } else if (message.equals("FZ4_ON")) {
-                        String address = prop.getProperty("FZTR4");
+                        /*String address = prop.getProperty("FZTR4");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));*/
+                        String address = prop.getProperty("QDTZ");
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
                     } else if (message.equals("FZ4_OFF")) {
-                        String address = prop.getProperty("FZQC4");
-                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
+                        /*String address = prop.getProperty("FZQC4");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));*/
+                        String address = prop.getProperty("QDTZ");
+                        SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address,"","")));
                     } else if (message.equals("FZ5_ON")) {
                         String address = prop.getProperty("FZTR5");
                         SocketClient.os.write(ConvertUtils.hexStringToBytes(generateCommand(address)));
@@ -131,6 +139,20 @@ public class ModbusSwitchControl {
         sbr.append("01");
         return sbr.toString();
     }
+
+    public static String generateCommand(String val2,String va,String bs){
+        int val = Integer.parseInt(val2);
+        String address = Integer.toHexString(val).length() == 1 ? "0".concat(Integer.toHexString(val)) : Integer.toHexString(val);
+        StringBuffer sbr = new StringBuffer(ModbusSendGenerate.TcpHead);
+        sbr.append("01");
+        sbr.append("06");
+        sbr.append("00");
+        sbr.append(address);
+        sbr.append("00");
+        sbr.append("00");
+        return sbr.toString();
+    }
+
     public static String generateCommand(String val2,String workMode){
         int val = Integer.parseInt(val2);
         String address = Integer.toHexString(val).length() == 1 ? "0".concat(Integer.toHexString(val)) : Integer.toHexString(val);
