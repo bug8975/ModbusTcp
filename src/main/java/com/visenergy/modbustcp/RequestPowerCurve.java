@@ -19,7 +19,7 @@ public class RequestPowerCurve {
     private static Channel channel = null;
     private static Logger log = Logger.getLogger(RequestPowerCurve.class);
 
-    public RequestPowerCurve() throws IOException, TimeoutException {
+    public RequestPowerCurve() {
 
     }
     static {
@@ -42,7 +42,7 @@ public class RequestPowerCurve {
                     try {
                         RabbitMqUtils.sendMq(getChannel2(),"POWER_ARRAY",jsonArray.toString());
                     } catch (TimeoutException e) {
-                        e.printStackTrace();
+                        log.error("rabbitMq发送消息失败",e);
                     }
                 }
             };
@@ -67,7 +67,7 @@ public class RequestPowerCurve {
                         RabbitMqUtils.sendMq(getChannel2(),"SWITCH_STATUS_RETURN",jsonObject.toString());
                         log.debug(jsonObject.toString());
                     } catch (TimeoutException e) {
-                        e.printStackTrace();
+                        log.error("rabbitMq发送消息失败",e);
                     }
                 }
             };

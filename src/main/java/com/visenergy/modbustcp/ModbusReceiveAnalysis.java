@@ -39,7 +39,7 @@ public class ModbusReceiveAnalysis {
      * @param data 传入命令
      * @throws Exception
      */
-    public static void analysis(String data) throws IOException, TimeoutException {
+    public static void analysis(String data) {
 
         String[] answer = data.split(" ");
         int lenth = Integer.parseInt(answer[5], 16) < 0 ? Integer.parseInt(answer[5], 16) + 256 : Integer.parseInt(answer[5], 16);
@@ -121,7 +121,13 @@ public class ModbusReceiveAnalysis {
             dataHandle.setZFDL(ZFDL);
             dataHandle.setSZDMS(SZDMS);
             JSONObject jsonObject = JSONObject.fromObject(map);
-            RabbitMqUtils.sendMq(getChannel(), "STATUS", jsonObject.toString());
+            try {
+                RabbitMqUtils.sendMq(getChannel(), "STATUS", jsonObject.toString());
+            } catch (IOException e) {
+                log.error("rabbitMq发送消息失败",e);
+            } catch (TimeoutException e) {
+                log.error("rabbitMq发送消息失败",e);
+            }
         } else if (lenth == 101) {
             BigDecimal SDGLA = new BigDecimal(Integer.parseInt(answer[45].concat(answer[46]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
             BigDecimal SDGLB = new BigDecimal(Integer.parseInt(answer[47].concat(answer[48]), 16)).divide(new BigDecimal(25),2,BigDecimal.ROUND_HALF_UP);
@@ -230,7 +236,13 @@ public class ModbusReceiveAnalysis {
             dataHandle.setFZGL5(FZGL5.intValue());
             dataHandle.setFZGL6(FZGL6.intValue());
             JSONObject jsonObject = JSONObject.fromObject(map);
-            RabbitMqUtils.sendMq(getChannel(), "POWER", jsonObject.toString());
+            try {
+                RabbitMqUtils.sendMq(getChannel(), "POWER", jsonObject.toString());
+            } catch (IOException e) {
+                log.error("rabbitMq发送消息失败",e);
+            } catch (TimeoutException e) {
+                log.error("rabbitMq发送消息失败",e);
+            }
         } else if (lenth == 207) {
             BigDecimal GFUA = new BigDecimal(Integer.parseInt(answer[9].concat(answer[10]), 16)).multiply(new BigDecimal("0.1"));
             BigDecimal GFUB = new BigDecimal(Integer.parseInt(answer[11].concat(answer[12]), 16)).multiply(new BigDecimal("0.1"));
@@ -486,7 +498,13 @@ public class ModbusReceiveAnalysis {
             map.put("FZYS5", FZYS5);
             map.put("FZYS6", FZYS6);
             JSONObject jsonObject = JSONObject.fromObject(map);
-            RabbitMqUtils.sendMq(getChannel(), "VOLTAGE_CURRENT", jsonObject.toString());
+            try {
+                RabbitMqUtils.sendMq(getChannel(), "VOLTAGE_CURRENT", jsonObject.toString());
+            } catch (IOException e) {
+                log.error("rabbitMq发送消息失败",e);
+            } catch (TimeoutException e) {
+                log.error("rabbitMq发送消息失败",e);
+            }
         } else if (lenth == 6) {
            int address = Integer.parseInt(answer[9],16);
            Map<Integer,String> addressAndSwitchName = ModbusReceiveAnalysis.addressAndSwitchName();
@@ -494,7 +512,13 @@ public class ModbusReceiveAnalysis {
            for (Map.Entry<Integer,String> entry : addressAndSwitchName.entrySet()){
                if (address == entry.getKey()){
                    switchName = addressAndSwitchName.get(entry.getKey());
-                   RabbitMqUtils.sendMq(getChannel(), "SUCCESS", switchName);
+                   try {
+                       RabbitMqUtils.sendMq(getChannel(), "SUCCESS", switchName);
+                   } catch (IOException e) {
+                       log.error("rabbitMq发送消息失败",e);
+                   } catch (TimeoutException e) {
+                       log.error("rabbitMq发送消息失败",e);
+                   }
                    break;
                }
            }
@@ -571,9 +595,9 @@ public class ModbusReceiveAnalysis {
                 channel = conn.createChannel();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("初始化rabbit失败",e);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.error("初始化rabbit失败",e);
         }
         return channel;
     }

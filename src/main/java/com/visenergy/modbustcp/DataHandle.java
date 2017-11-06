@@ -128,11 +128,10 @@ public class DataHandle {
                 parameter[i++] = new Parameter("FZYS4", BaseTypes.DECIMAL,FZYS4);
                 parameter[i++] = new Parameter("FZYS5", BaseTypes.DECIMAL,FZYS5);
                 parameter[i++] = new Parameter("FZYS6", BaseTypes.DECIMAL,FZYS6);
-                i = 0;
                 try {
                     SqlHelper.executeNonQuery(conn, CommandType.Text,sql,parameter);
                 } catch (Exception e) {
-                    log.debug("存储数据出错！",e);
+                    log.error("存储数据出错！",e);
                 }
             }
         };

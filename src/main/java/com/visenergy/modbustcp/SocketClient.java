@@ -25,13 +25,17 @@ public class SocketClient {
     static InputStream is = null;
     static OutputStream os = null;
     private static Logger log = Logger.getLogger(SocketClient.class);
-    public SocketClient() throws IOException, TimeoutException {
+    public SocketClient(){
 
         new ModbusSwitchControl();
         new RequestPowerCurve();
-         socket = new Socket(remoteIp,port);
-         is = socket.getInputStream();
-         os = socket.getOutputStream();
+        try {
+            socket = new Socket(remoteIp,port);
+            is = socket.getInputStream();
+            os = socket.getOutputStream();
+        } catch (IOException e) {
+            log.error("创建socket客户端出错！",e);
+        }
          write();
          read();
 
@@ -39,31 +43,30 @@ public class SocketClient {
 
 
 
-    public void read() throws IOException {
+    public void read() {
 
         while (true){
             int data = 0;
-            if ((data=is.read())!=-1){
-                byte[] head = new byte[6];
-                head[0] = (byte) data;
-                is.read(head,1,5);
-//                int length = Integer.parseInt((Integer.toHexString(head[4])).concat(Integer.toHexString(head[5])),16);
-                int length = head[5] < 0 ? head[5] + 256 : head[5];
-                byte[] overData = new byte[length];
-                for (int i = 0; i < length; i++) {
-                    overData[i] = (byte) is.read();
-                }
-                byte[] newData = new byte[head.length+overData.length];
-                System.arraycopy(head,0,newData,0,head.length);
-                System.arraycopy(overData,0,newData,head.length,overData.length);
-                log.debug(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
+            try {
+                if ((data=is.read())!=-1){
+                    byte[] head = new byte[6];
+                    head[0] = (byte) data;
+                    is.read(head,1,5);
+    //                int length = Integer.parseInt((Integer.toHexString(head[4])).concat(Integer.toHexString(head[5])),16);
+                    int length = head[5] < 0 ? head[5] + 256 : head[5];
+                    byte[] overData = new byte[length];
+                    for (int i = 0; i < length; i++) {
+                        overData[i] = (byte) is.read();
+                    }
+                    byte[] newData = new byte[head.length+overData.length];
+                    System.arraycopy(head,0,newData,0,head.length);
+                    System.arraycopy(overData,0,newData,head.length,overData.length);
+                    log.debug(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
 
-                try {
                     ModbusReceiveAnalysis.analysis(ConvertUtils.addSpace(ConvertUtils.toHexString(newData)));
-                    log.debug("开始解析");
-                } catch (Exception e) {
-                    log.error("解析出错",e);
                 }
+            } catch (IOException e) {
+               log.error("socket读取消息出错！",e);
             }
         }
 
@@ -97,13 +100,7 @@ public class SocketClient {
     }
 
     public static void main(String[] args) {
-        try {
             new SocketClient();
-        } catch (IOException e) {
-            log.error("启动socketClient出错",e);
-        } catch (TimeoutException e) {
-            log.error("启动socketClient出错",e);
-        }
     }
 
 }
